@@ -1,0 +1,25 @@
+{
+  "uuid": "64e84579-3545-4206-b85c-41c0d7ee04f8",
+  "shortName": "GlanceClone",
+  "longName": "GlanceClone",
+  "companyName": "MakeAwesomeHappen",
+  "versionCode": 1,
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite", "basalt"],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": [
+	{
+		"type": "png",
+		"name": "BACKGROUND",
+		"file": "images/Background.png"
+	}
+    ]
+  }
+}
