@@ -10,7 +10,12 @@ static BitmapLayer *s_background_layer;
 static GBitmap *s_background_bitmap;
 
 // Updates Time and Date  
-static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changer) {
+static void update_time_date() {
+
+  // Pulls time from system 
+  time_t now = time(NULL);
+  struct tm *tick_time = localtime(&now);
+
   static char s_time_text[] = "00:00";
   static char s_date_text[] = "XxxxxXxx 00";
 
@@ -61,8 +66,11 @@ static void main_window_load(Window *window) {
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
-  text_layer_set_text_alignment(s_weather_layer, GTextAlignmentRight);
+  text_layer_set_text_alignment(s_weather_layer, GTextAlignmentLeft);
   layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
+
+  // update the time and date on load
+  update_time_date();
 }
 
 static void main_window_unload(Window *window) {
@@ -82,7 +90,10 @@ static void main_window_unload(Window *window) {
 
 }
 
-static void tick_weather(struct tm *tick_time, TimeUnits units_changer) {
+static void minute_tick_handler(struct tm *tick_time, TimeUnits units_changer) {
+  // Functions to run ever minute
+  update_time_date();
+ 
   // Update Weather every 30 mins
   if(tick_time->tm_min % 30 == 0) {
     DictionaryIterator *iter;
@@ -90,6 +101,7 @@ static void tick_weather(struct tm *tick_time, TimeUnits units_changer) {
     dict_write_uint8(iter, 0, 0);
     app_message_outbox_send();
   }
+ 
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
@@ -150,12 +162,7 @@ static void init(void) {
   const bool animated = true;
   window_stack_push(s_main_window, animated);
 
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
-
-  //Prevent starting blank
-  time_t now = time(NULL);
-  struct tm *t = localtime(&now);
-  handle_minute_tick(t, MINUTE_UNIT); 
+  tick_timer_service_subscribe(MINUTE_UNIT, minute_tick_handler);
 
   // Register callbacks
   app_message_register_inbox_received(inbox_received_callback);
