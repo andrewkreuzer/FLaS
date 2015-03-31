@@ -62,7 +62,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   // Weather
-  s_weather_layer = text_layer_create(GRect(50, 12, 90, 30));
+  s_weather_layer = text_layer_create(GRect(0, 12, 140, 30));
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
