@@ -4,10 +4,21 @@
 #define KEY_CONDITIONS 1 
 
 static Window *s_main_window;
-static TextLayer *s_time_layer, *s_date_layer, *s_weather_layer;
+static TextLayer *s_time_layer, *s_date_layer, 
+				 *s_weather_layer; //*s_wbattery_layer;
+
 
 static BitmapLayer *s_background_layer;
 static GBitmap *s_background_bitmap;
+
+/*
+static void battery_handler(BatteryChargeState new_state) {
+  // Write to buffer and display
+  static char s_battery_buffer[32];
+  snprintf(s_battery_buffer, sizeof(s_battery_buffer), "%d", new_state.charge_percent);
+  text_layer_set_text(s_wbattery_layer, s_battery_buffer);
+}
+*/
 
 // Updates Time and Date  
 static void update_time_date() {
@@ -62,18 +73,28 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   // Weather
-  s_weather_layer = text_layer_create(GRect(0, 12, 140, 30));
+  s_weather_layer = text_layer_create(GRect(50, 8, 90, 30));
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorBlack);
   text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   text_layer_set_text_alignment(s_weather_layer, GTextAlignmentLeft);
   layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
+/*
+  // Battery level
+  s_wbattery_layer = text_layer_create(GRect(0, 150, 10, 10));
+  text_layer_set_background_color(s_wbattery_layer, GColorClear);
+  text_layer_set_text_color(s_weather_layer, GColorWhite);
+  text_layer_set_text_alignment(s_wbattery_layer, GTextAlignmentLeft);
+  layer_add_child(window_layer, text_layer_get_layer(s_wbattery_layer));
 
-  // update the time and date on load
+  // updates on load
+  battery_handler(battery_state_service_peek());
+  */
   update_time_date();
 }
 
 static void main_window_unload(Window *window) {
+
   // Destroy Time
   text_layer_destroy(s_time_layer);
 
@@ -86,6 +107,9 @@ static void main_window_unload(Window *window) {
   // Destroy Background Image
   gbitmap_destroy(s_background_bitmap);
   bitmap_layer_destroy(s_background_layer);
+
+  // Destroy Battery
+  //text_layer_destroy(s_wbattery_layer);
 
 
 }
@@ -118,7 +142,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Which key was received?
     switch(t->key) {
     case KEY_TEMPERATURE:
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%dC", (int)t->value->int32);
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°" , (int)t->value->int32);
       break;
     case KEY_CONDITIONS:
       snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
@@ -133,7 +157,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   }
 
   // Assemble string and display
-  snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
+  snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s %s", conditions_buffer, temperature_buffer);
   text_layer_set_text(s_weather_layer, weather_layer_buffer);
 }
 
@@ -162,6 +186,8 @@ static void init(void) {
   const bool animated = true;
   window_stack_push(s_main_window, animated);
 
+  // subscibers
+  //battery_state_service_subscribe(battery_handler);
   tick_timer_service_subscribe(MINUTE_UNIT, minute_tick_handler);
 
   // Register callbacks
@@ -178,6 +204,7 @@ static void deinit(void) {
   window_destroy(s_main_window);
 
   tick_timer_service_unsubscribe();
+  //battery_state_service_unsubscribe();
 }
 
 int main(void) {
