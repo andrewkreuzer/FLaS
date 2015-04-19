@@ -11,14 +11,6 @@ static TextLayer *s_time_layer, *s_date_layer,
 static BitmapLayer *s_background_layer;
 static GBitmap *s_background_bitmap;
 
-/*
-static void battery_handler(BatteryChargeState new_state) {
-  // Write to buffer and display
-  static char s_battery_buffer[32];
-  snprintf(s_battery_buffer, sizeof(s_battery_buffer), "%d", new_state.charge_percent);
-  text_layer_set_text(s_wbattery_layer, s_battery_buffer);
-}
-*/
 
 // Updates Time and Date  
 static void update_time_date() {
@@ -79,17 +71,7 @@ static void main_window_load(Window *window) {
   text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   text_layer_set_text_alignment(s_weather_layer, GTextAlignmentLeft);
   layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
-/*
-  // Battery level
-  s_wbattery_layer = text_layer_create(GRect(0, 150, 10, 10));
-  text_layer_set_background_color(s_wbattery_layer, GColorClear);
-  text_layer_set_text_color(s_weather_layer, GColorWhite);
-  text_layer_set_text_alignment(s_wbattery_layer, GTextAlignmentLeft);
-  layer_add_child(window_layer, text_layer_get_layer(s_wbattery_layer));
 
-  // updates on load
-  battery_handler(battery_state_service_peek());
-  */
   update_time_date();
 }
 
@@ -107,9 +89,6 @@ static void main_window_unload(Window *window) {
   // Destroy Background Image
   gbitmap_destroy(s_background_bitmap);
   bitmap_layer_destroy(s_background_layer);
-
-  // Destroy Battery
-  //text_layer_destroy(s_wbattery_layer);
 
 
 }
@@ -187,7 +166,6 @@ static void init(void) {
   window_stack_push(s_main_window, animated);
 
   // subscibers
-  //battery_state_service_subscribe(battery_handler);
   tick_timer_service_subscribe(MINUTE_UNIT, minute_tick_handler);
 
   // Register callbacks
@@ -204,7 +182,6 @@ static void deinit(void) {
   window_destroy(s_main_window);
 
   tick_timer_service_unsubscribe();
-  //battery_state_service_unsubscribe();
 }
 
 int main(void) {
