@@ -77,3 +77,4 @@ Pebble.addEventListener('appmessage',
     getWeather();
   }                     
 );
+
