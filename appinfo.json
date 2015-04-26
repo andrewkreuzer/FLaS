@@ -11,16 +11,16 @@
     "watchface": false
   },
   "appKeys": {
-    "KEY_TEMPERATURE": 0,
-	"KEY_CONDITIONS" : 1
+		"WEATHER_CONDITIONS_KEY" : 1,
+    "WEATHER_TEMPERATURE_KEY": 0
   },
   "resources": {
     "media": [
-	{
-		"type": "png",
-		"name": "BACKGROUND",
-		"file": "images/Background.png"
-	}
+			{
+				"type": "png",
+				"name": "BACKGROUND",
+				"file": "images/Background.png"
+			}
     ]
   }
 }

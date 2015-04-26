@@ -7,52 +7,40 @@ var xhrRequest = function (url, type, callback) {
   xhr.send();
 };
 
+function getWeather(latitude, longitude) {
+	var url = "http://api.openweathermap.org/data/2.5/weather?lat=" +
+		latitude + "&lon=" + longitude;
+	xhrRequest(url, 'GET',
+			function(responseText) {
+				var json = JSON.parse(responseText);
+				var temerature = MATH.round(json.main.temp - 273.15);
+				var conditions = json.weather[0].main;
+				console.log("It's " + conditions + "and " + temerature);
+				Pebble.sendAppMessage({
+					"WEATHER_TEMPERATUR_KEY":temperature + "\u00B0C",
+					"WEATHER_CONDITIONS_KEY":conditions},
+					function(e) { console.log("Weather info send succesfully")},
+					function(e) { console.log("Error sending weather info")}
+					);
+	}
+}
+				
+
+
 function locationSuccess(pos) {
-
-  console.log("Location Success started");
-
-  // Construct URL
-  var url = "http://api.openweathermap.org/data/2.5/weather?lat=" +
-      pos.coords.latitude + "&lon=" + pos.coords.longitude;
-
-  // Send request to OpenWeatherMap
-  xhrRequest(url, 'GET', 
-    function(responseText) {
-      // responseText contains a JSON object with weather info
-      var json = JSON.parse(responseText);
-
-      // Temperature in Kelvin requires adjustment
-      var temperature = Math.round(json.main.temp - 273.15);
-      console.log("Temperature is " + temperature);
-
-      // Conditions
-      var conditions = json.weather[0].main;      
-      console.log("Conditions are " + conditions);
-      
-      // Assemble dictionary using our keys
-      var dictionary = {
-        "KEY_TEMPERATURE": temperature,
-        "KEY_CONDITIONS": conditions
-      };
-
-      // Send to Pebble
-      Pebble.sendAppMessage(dictionary,
-        function(e) {
-          console.log("Weather info sent to Pebble successfully!");
-        },
-        function(e) {
-          console.log("Error sending weather info to Pebble!");
-        }
-      );
-    }      
-  );
+	var coordinates = ps.coords;
+	getWeather(coordinates.latitude, coordinates.longitude);
 }
 
 function locationError(err) {
   console.log("Error requesting location!");
+	Pebble.sendAppMessage({
+		"WEATHER_TEMPERATURE_KEY":"Unavailable",
+		"WEATHER_CONDITIONS_KEY" :"N/A"
+	});
 }
 
-function getWeather() {
+function getLocation() {
   navigator.geolocation.getCurrentPosition(
     locationSuccess,
     locationError,
@@ -66,7 +54,7 @@ Pebble.addEventListener('ready',
     console.log("PebbleKit JS ready!");
 
     // Get the initial weather
-    getWeather();
+    getLocation();
   }
 );
 
@@ -74,7 +62,7 @@ Pebble.addEventListener('ready',
 Pebble.addEventListener('appmessage',
   function(e) {
     console.log("AppMessage received!");
-    getWeather();
+    getLocation();
   }                     
 );
 
