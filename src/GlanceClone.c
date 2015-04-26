@@ -5,7 +5,7 @@
 
 static Window *s_main_window;
 static TextLayer *s_time_layer, *s_date_layer, 
-				 *s_weather_layer; //*s_wbattery_layer;
+				 *s_weather_layer;
 
 
 static BitmapLayer *s_background_layer;
