@@ -3,8 +3,8 @@
 static Window *s_main_window;
 
 static TextLayer *s_time_layer, *s_date_layer, 
-								 *s_icon_layer, *s_temperature_layer
-								 *s_conditions_layer;
+								 *s_temperature_layer, *s_conditions_layer;
+								 
 
 static BitmapLayer *s_background_layer, *s_icon_layer;
 static GBitmap *s_background_bitmap, *s_icon_bitmap = NULL;
@@ -19,6 +19,7 @@ enum WeatherKey {
 
 //!!!!!!! ICONS !!!!!!!!!
 //???????????????????????
+
 
 
 // Updates Time and Date  
@@ -154,6 +155,12 @@ static void main_window_unload(Window *window) {
   // Destroy Background Image
   gbitmap_destroy(s_background_bitmap);
   bitmap_layer_destroy(s_background_layer);
+
+	// Destroy Weather
+	gbitmap_destroy(s_icon_bitmap);
+	bitmap_layer_destroy(s_icon_layer);
+	text_layer_destroy(s_temperature_layer);
+	text_layer_destroy(s_conditions_layer);
 
 
 }
