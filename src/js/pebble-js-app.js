@@ -59,18 +59,16 @@ function getWeather(latitude, longitude) {
 	xhrRequest(url, 'GET', 
 		function(responseText) {
 			var json = JSON.parse(responseText);
-			var temperature = Math.round(json.main.temp - 273.15).toString();
-			console.log(typeof temperature);
+			var temperature = Math.round(json.main.temp - 273.15);
 			var conditions = json.weather[0].main;
-			var weatherIcon = json.weather[0].icon;
-			var iconNum = weatherIcontoInt(weatherIcon);
+			var iconNum = weatherIcontoInt(json.weather[0].icon);
 
 			Pebble.sendAppMessage({
-					"WEATHER_TEMPERATURE_KEY": temperature + "\u00B0",
+					"WEATHER_TEMPERATURE_KEY": temperature,
 					"WEATHER_CONDITIONS_KEY": conditions,
 					"WEATHER_ICON_KEY": iconNum
 					},
-					function(e) { console.log("Weather info sent succesfully | Temperature: " + temperature + ", Conditions: " + conditions + ", Icon Number: " + iconNum);},
+					function(e) { console.log("Weather info sent succesfully | Temperature: " + typeof temperature + temperature + ", Conditions: " + typeof conditions + conditions + ", Icon Number: " + typeof iconNum + iconNum);},
 					function(e) { console.log("Error sending weather info "
 							+ temperature + conditions + iconNum);}
 			);
