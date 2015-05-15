@@ -9,18 +9,31 @@ static TextLayer *s_time_layer, *s_date_layer,
 static BitmapLayer *s_background_layer, *s_icon_layer;
 static GBitmap *s_background_bitmap, *s_icon_bitmap = NULL;
 
+
+/*
 static AppSync s_sync;
 static uint8_t s_sync_buffer[64];
+*/
 
 enum WeatherKey {
 	WEATHER_CONDITIONS_KEY = 0x1,
-	WEATHER_TEMPERATURE_KEY = 0x2,
+	WEATHER_ICON_KEY = 0x2,
+	WEATHER_TEMPERATURE_KEY = 0x3,
 };
 
-//!!!!!!! ICONS !!!!!!!!!
-//???????????????????????
-
-
+static uint8_t WEATHER_ICONS[] = {
+	RESOURCE_ID_ICON_CLEAR_DAY, //0
+	RESOURCE_ID_ICON_CLEAR_NIGHT, //1
+	RESOURCE_ID_ICON_RAIN, //2
+	RESOURCE_ID_ICON_SNOW, //3
+	RESOURCE_ID_ICON_FOG, //4
+	RESOURCE_ID_ICON_CLOUDY, //5 
+	RESOURCE_ID_ICON_PARTLY_CLOUDY_DAY, //6
+	RESOURCE_ID_ICON_PARTLY_CLOUDY_NIGHT, //7
+	RESOURCE_ID_ICON_THUNDER, //8
+	RESOURCE_ID_ICON_DRIZZLE, //9
+	RESOURCE_ID_ICON_NOT_AVAILABLE, //10
+};
 
 // Updates Time and Date  
 static void update_time_date() {
@@ -49,19 +62,24 @@ static void update_time_date() {
   text_layer_set_text(s_time_layer, s_time_text);
 }
 
+
+
+/*
 static void sync_error_callback(DictionaryResult dict_error, AppMessageResult app_message_error, void *context) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "App Message Sync Error: %d", app_message_error);}
 
-static void sync_tulpe_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
+static void sync_changed_callback(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
 	switch (key) {
 		case WEATHER_CONDITIONS_KEY:
 			text_layer_set_text(s_conditions_layer, new_tuple->value->cstring);
+			break;
 
+		case WEATHER_ICON_KEY:
 			if (s_icon_bitmap) {
 				gbitmap_destroy(s_icon_bitmap);
 			}
 
-			s_icon_bitmap = gbitmap_create_with_resource(WEATHER_ICONS[new_tuple->value->cstring]);
+			s_icon_bitmap = gbitmap_create_with_resource(WEATHER_ICONS[new_tuple->value->uint8]);
 			bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
 			break;
 
@@ -76,6 +94,7 @@ static void request_weather(void) {
 	app_message_outbox_begin(&iter);
 
 	if(!iter) {
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "!iter, Error");
 		// Error
 		return;
 	}
@@ -85,11 +104,14 @@ static void request_weather(void) {
 	dict_write_end(iter);
 
 	app_message_outbox_send();
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "request weather sent");
 }
 
-static void main_window_load(Window *window) {
-  Layer *window_layer = window_get_root_layer(window);
-	GRect bounds = layer_get_bounds(window_layer);
+*/
+
+
+
+static void main_window_load(Window *window) { Layer *window_layer = window_get_root_layer(window); GRect bounds = layer_get_bounds(window_layer);
 
   //Background
   s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BACKGROUND);
@@ -115,32 +137,40 @@ static void main_window_load(Window *window) {
 
 	// Weather
 		// Temp layer
-	s_temperature_layer = text_layer_create(GRect(0, 0, bounds.size.w, 68));
+	s_temperature_layer = text_layer_create(GRect(10, 20, bounds.size.w, 68));
 	text_layer_set_text_color(s_temperature_layer, GColorBlack);
 	text_layer_set_background_color(s_temperature_layer, GColorClear);
 	text_layer_set_font(s_temperature_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
 	text_layer_set_text_alignment(s_temperature_layer, GTextAlignmentLeft);
 	layer_add_child(window_layer, text_layer_get_layer(s_temperature_layer));
 		// Conditions layer
-	s_conditions_layer = text_layer_create(GRect(5, 5, bounds.size.w, 30));
+	s_conditions_layer = text_layer_create(GRect(50, 6, bounds.size.w, 30));
 	text_layer_set_text_color(s_temperature_layer, GColorBlack);
 	text_layer_set_background_color(s_conditions_layer, GColorClear);
 	text_layer_set_font(s_conditions_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
 	text_layer_set_text_alignment(s_conditions_layer, GTextAlignmentLeft);
 	layer_add_child(window_layer, text_layer_get_layer(s_conditions_layer));
+		// Icon layer
+	s_icon_layer = bitmap_layer_create(GRect(0, 50, 45, 45));
+	layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
 
+
+/*
 	Tuplet initial_values[] = {
-		TupletString(WEATHER_CONDITIONS_KEY, "example"),
-		TupletInteger(WEATHER_TEMPERATURE_KEY, "123\u00B0")
+		TupletCString(WEATHER_CONDITIONS_KEY, "example"),
+		TupletInteger(WEATHER_ICON_KEY, (uint8_t) 1),
+		TupletCString(WEATHER_TEMPERATURE_KEY, "123\u00B0")
 	};
 
 	app_sync_init(&s_sync, s_sync_buffer, sizeof(s_sync_buffer),
 			initial_values, ARRAY_LENGTH(initial_values),
-			sync_tuple_changed_callback, sync_error_callback, NULL
+			sync_changed_callback, sync_error_callback, NULL
 	);
 
-	request_weather();
+	// Initial calls for value population
   update_time_date();
+
+*/
 
 }
 
@@ -175,7 +205,9 @@ static void minute_tick_handler(struct tm *tick_time, TimeUnits units_changer) {
 static void init(void) {
   // Create main window
   s_main_window = window_create();
+#ifdef PBL_SDK_2
   window_set_fullscreen(s_main_window, true);
+#endif
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = main_window_load,
     .unload = main_window_unload,
@@ -185,6 +217,8 @@ static void init(void) {
 
   // subscibers
   tick_timer_service_subscribe(MINUTE_UNIT, minute_tick_handler);
+
+	app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 
 }
 

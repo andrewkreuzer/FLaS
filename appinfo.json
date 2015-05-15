@@ -11,8 +11,9 @@
     "watchface": false
   },
   "appKeys": {
-		"WEATHER_CONDITIONS_KEY" : 1,
-    "WEATHER_TEMPERATURE_KEY": 0
+		"WEATHER_CONDITIONS_KEY" : 0,
+    "WEATHER_TEMPERATURE_KEY": 2,
+		"WEATHER_ICON_KEY": 1
   },
   "resources": {
     "media": [
@@ -20,7 +21,62 @@
 				"type": "png",
 				"name": "BACKGROUND",
 				"file": "images/Background.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_CLEAR_DAY",
+				"file": "images/icons/clear-day.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_CLEAR_NIGHT",
+				"file": "images/icons/clear-night.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_RAIN",
+				"file": "images/icons/rain.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_CLOUDY",
+				"file": "images/icons/cloudy.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_SNOW",
+				"file": "images/icons/snow.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_DRIZZLE",
+				"file": "images/icons/drizzle.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_FOG",
+				"file": "images/icons/fog.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_PARTLY_CLOUDY_DAY",
+				"file": "images/icons/partly-cloudy-day.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_PARTLY_CLOUDY_NIGHT",
+				"file": "images/icons/partly-cloudy-night.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_THUNDER",
+				"file": "images/icons/thunder.png"
+			},
+			{
+				"type": "png",
+				"name": "ICON_NOT_AVAILABLE",
+				"file": "images/icons/not-available.png"
 			}
-    ]
+	]
   }
 }
