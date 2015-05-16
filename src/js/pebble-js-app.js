@@ -32,7 +32,7 @@ function weatherIcontoInt(weatherIcon) {
 				result = 2;
 				break;
 			case "10d":
-			case"10n":
+			case "10n":
 				result = 9;
 				break;
 			case "11d":
@@ -59,20 +59,23 @@ function getWeather(latitude, longitude) {
 	xhrRequest(url, 'GET', 
 		function(responseText) {
 			var json = JSON.parse(responseText);
+			
+			console.log(responseText);
+
 			var temperature = Math.round(json.main.temp - 273.15);
 			var conditions = json.weather[0].main;
 			var iconNum = weatherIcontoInt(json.weather[0].icon);
 
-			Pebble.sendAppMessage({
-					"WEATHER_TEMPERATURE_KEY": temperature,
+			var dictionary = { 
+			  	"WEATHER_TEMPERATURE_KEY": temperature,
 					"WEATHER_CONDITIONS_KEY": conditions,
 					"WEATHER_ICON_KEY": iconNum
-					},
-					function(e) { console.log("Weather info sent succesfully | Temperature: " + typeof temperature + temperature + ", Conditions: " + typeof conditions + conditions + ", Icon Number: " + typeof iconNum + iconNum);},
-					function(e) { console.log("Error sending weather info "
-							+ temperature + conditions + iconNum);}
-			);
+					};
 
+			Pebble.sendAppMessage(dictionary,
+					function(e) { console.log("Weather info sent succesfully | Temperature: " + temperature + ", Conditions: " + conditions + ", Icon Number: " + iconNum);},
+					function(e) { console.log("Sending weather info was unsuccesfull | Temperature: " + temperature + ", Conditions: " + conditions + ", Icon Number: " + iconNum);}
+			);
 		}
 	);
 }
@@ -86,7 +89,7 @@ function locationSuccess(pos) {
 function locationError(err) {
   console.log("Error requesting location!");
 	Pebble.sendAppMessage({
-		"WEATHER_TEMPERATURE_KEY":"Unavailable",
+		"WEATHER_TEMPERATURE_KEY": 404,
 		"WEATHER_CONDITIONS_KEY" :"N/A",
 		"WEATHER_ICON_KEY"       : 10
 	});
@@ -114,7 +117,7 @@ Pebble.addEventListener('ready',
 Pebble.addEventListener('appmessage',
   function(e) {
     console.log("AppMessage received!");
-	console.log(appmessage)
+		console.log(appmessage)
     getLocation();
   }                     
 );

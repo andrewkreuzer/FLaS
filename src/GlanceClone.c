@@ -16,10 +16,11 @@ static uint8_t s_sync_buffer[64];
 */
 
 enum WeatherKey {
-	WEATHER_CONDITIONS_KEY = 0x1,
-	WEATHER_ICON_KEY = 0x2,
-	WEATHER_TEMPERATURE_KEY = 0x3,
+	WEATHER_CONDITIONS_KEY = 0x0,
+	WEATHER_ICON_KEY = 0x1,
+	WEATHER_TEMPERATURE_KEY = 0x2,
 };
+
 
 static uint8_t WEATHER_ICONS[] = {
 	RESOURCE_ID_ICON_CLEAR_DAY, //0
@@ -109,6 +110,14 @@ static void request_weather(void) {
 
 */
 
+static void send_app_message(void) {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  dict_write_uint8(iter, 0, 0);
+  app_message_outbox_send();
+};
+  
+
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   // Store incoming information
   static char temperature_buffer[8];
@@ -123,7 +132,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     // Which key was received?
     switch(t->key) {
     case WEATHER_TEMPERATURE_KEY:
-      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°" , (int)t->value->int32);
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d" , (int)t->value->int32);
       break;
 
     case WEATHER_CONDITIONS_KEY:
@@ -196,14 +205,18 @@ static void main_window_load(Window *window) { Layer *window_layer = window_get_
 	s_weather_layer = text_layer_create(GRect(50, 8, 90, 30));
 	text_layer_set_text_color(s_weather_layer, GColorBlack);
 	text_layer_set_background_color(s_weather_layer, GColorClear);
-	text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+	text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21));
 	text_layer_set_text_alignment(s_weather_layer, GTextAlignmentLeft);
 	layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
 		// Icon 
-	s_icon_layer = bitmap_layer_create(GRect(0, 50, 45, 45));
+	s_icon_layer = bitmap_layer_create(GRect(0, 60, 50, 50));
 	s_icon_bitmap = gbitmap_create_with_resource(WEATHER_ICONS[10]);
 	bitmap_layer_set_bitmap(s_icon_layer, s_icon_bitmap);
-	
+#ifdef PBL_PLATFORM_APLITE
+  bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpAnd);
+#elif PBL_PLATFORM_BASALT
+  bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
+#endif
 	layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
 
 
@@ -218,11 +231,11 @@ static void main_window_load(Window *window) { Layer *window_layer = window_get_
 			initial_values, ARRAY_LENGTH(initial_values),
 			sync_changed_callback, sync_error_callback, NULL
 	);
+*/
 
 	// Initial calls for value population
   update_time_date();
 
-*/
 
 }
 
@@ -246,17 +259,16 @@ static void main_window_unload(Window *window) {
 
 }
 
+
+
 static void minute_tick_handler(struct tm *tick_time, TimeUnits units_changer) {
   // Functions to run ever minute
   update_time_date();
 
   // Update Weather every 30 mins
   if(tick_time->tm_min % 30 == 0) {
-    DictionaryIterator *iter;
-    app_message_outbox_begin(&iter);
-    dict_write_uint8(iter, 0, 0);
-    app_message_outbox_send();
-  }
+		send_app_message();
+}
  
 }
 
