@@ -3,7 +3,7 @@
 static Window *s_main_window;
 
 static TextLayer *s_time_layer, *s_date_layer, 
-								 *s_weather_layer;
+								 *s_battery_layer,*s_weather_layer;
 								 
 
 static BitmapLayer *s_background_layer, *s_icon_layer;
@@ -35,6 +35,12 @@ static uint8_t WEATHER_ICONS[] = {
 	RESOURCE_ID_ICON_DRIZZLE, //9
 	RESOURCE_ID_ICON_NOT_AVAILABLE, //10
 };
+
+static void battery_handler(BatteryChargeState battery_state) {
+	static char s_battery_buffer[32];
+  snprintf(s_battery_buffer, sizeof(s_battery_buffer), "%d", battery_state.charge_percent);
+	text_layer_set_text(s_battery_layer, s_battery_buffer);
+}
 
 // Updates Time and Date  
 static void update_time_date() {
@@ -205,7 +211,7 @@ static void main_window_load(Window *window) { Layer *window_layer = window_get_
 	s_weather_layer = text_layer_create(GRect(50, 8, 90, 30));
 	text_layer_set_text_color(s_weather_layer, GColorBlack);
 	text_layer_set_background_color(s_weather_layer, GColorClear);
-	text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21));
+	text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
 	text_layer_set_text_alignment(s_weather_layer, GTextAlignmentLeft);
 	layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
 		// Icon 
@@ -218,6 +224,14 @@ static void main_window_load(Window *window) { Layer *window_layer = window_get_
   bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
 #endif
 	layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
+
+	// Battery
+	s_battery_layer = text_layer_create(GRect(0, 150, 15, 15));
+	text_layer_set_background_color(s_battery_layer, GColorClear);
+	text_layer_set_text_color(s_battery_layer, GColorWhite);
+	text_layer_set_font(s_battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
+	text_layer_set_text_alignment(s_battery_layer, GTextAlignmentLeft);
+	layer_add_child(window_layer, text_layer_get_layer(s_battery_layer));
 
 
 /*
@@ -235,7 +249,7 @@ static void main_window_load(Window *window) { Layer *window_layer = window_get_
 
 	// Initial calls for value population
   update_time_date();
-
+	battery_handler(battery_state_service_peek());
 
 }
 
@@ -256,6 +270,9 @@ static void main_window_unload(Window *window) {
 	bitmap_layer_destroy(s_icon_layer);
 	text_layer_destroy(s_weather_layer);
 
+	// Destroy Battery
+	text_layer_destroy(s_battery_layer);
+
 
 }
 
@@ -267,8 +284,9 @@ static void minute_tick_handler(struct tm *tick_time, TimeUnits units_changer) {
 
   // Update Weather every 30 mins
   if(tick_time->tm_min % 30 == 0) {
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "sending app message");
 		send_app_message();
-}
+	}
  
 }
 
@@ -288,6 +306,7 @@ static void init(void) {
 
   // subsciptions
   tick_timer_service_subscribe(MINUTE_UNIT, minute_tick_handler);
+	battery_state_service_subscribe(battery_handler);
 
 	// App Message
 	app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
@@ -299,9 +318,11 @@ static void init(void) {
 }
 
 static void deinit(void) {
-  window_destroy(s_main_window);
 
+  window_destroy(s_main_window);
+	battery_state_service_unsubscribe();
   tick_timer_service_unsubscribe();
+
 }
 
 int main(void) {

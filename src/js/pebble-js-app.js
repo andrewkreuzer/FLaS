@@ -117,7 +117,7 @@ Pebble.addEventListener('ready',
 Pebble.addEventListener('appmessage',
   function(e) {
     console.log("AppMessage received!");
-		console.log(appmessage)
+		console.log("the message: " +  appmessage)
     getLocation();
   }                     
 );
