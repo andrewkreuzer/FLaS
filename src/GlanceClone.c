@@ -1,15 +1,6 @@
 #include <pebble.h>
 
 static Window *s_main_window;
-<<<<<<< HEAD
-static TextLayer *s_time_layer, *s_date_layer, 
-				 *s_weather_layer;
-
-
-static BitmapLayer *s_background_layer;
-static GBitmap *s_background_bitmap;
-=======
->>>>>>> working
 
 static TextLayer *s_time_layer, *s_date_layer, 
 								 *s_battery_layer,*s_weather_layer;
