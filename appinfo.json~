@@ -1,7 +1,7 @@
 {
   "uuid": "64e84579-3545-4206-b85c-41c0d7ee04f8",
-  "shortName": "FLaS",
-  "longName": "Flat and Simple",
+  "shortName": "GlanceClone",
+  "longName": "GlanceClone",
   "companyName": "MakeAwesomeHappen",
   "versionCode": 1,
   "versionLabel": "1.0",
@@ -11,9 +11,9 @@
     "watchface": false
   },
   "appKeys": {
-		"WEATHER_CONDITIONS_KEY" : 0,
-    "WEATHER_TEMPERATURE_KEY": 2,
-		"WEATHER_ICON_KEY": 1
+		"WEATHER_CONDITIONS_KEY" : 1,
+	    "WEATHER_TEMPERATURE_KEY": 0,
+		"WEATHER_ICON_KEY": 2
   },
   "resources": {
     "media": [
@@ -21,61 +21,62 @@
 				"type": "png",
 				"name": "BACKGROUND",
 				"file": "images/Background.png"
-			},
+			}
 			{
 				"type": "png",
 				"name": "ICON_CLEAR_DAY",
-				"file": "images/icons/clear-day.png"
+				"file": "img/clear-day.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_CLEAR_NIGHT",
-				"file": "images/icons/clear-night.png"
+				"file": "img/clear-night.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_RAIN",
-				"file": "images/icons/rain.png"
+				"file": "img/rain.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_CLOUDY",
-				"file": "images/icons/cloudy.png"
+				"file": "img/cloudy.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_SNOW",
-				"file": "images/icons/snow.png"
+				"file": "img/snow.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_DRIZZLE",
-				"file": "images/icons/drizzle.png"
+				"file": "img/drizzle.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_FOG",
-				"file": "images/icons/fog.png"
+				"file": "img/fog.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_PARTLY_CLOUDY_DAY",
-				"file": "images/icons/partly-cloudy-day.png"
+				"file": "img/partly-cloudy-day.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_PARTLY_CLOUDY_NIGHT",
-				"file": "images/icons/partly-cloudy-night.png"
+				"file": "img/partly-cloudy-night.png"
+			}
 			},
 			{
 				"type": "png",
 				"name": "ICON_THUNDER",
-				"file": "images/icons/thunder.png"
+				"file": "img/thunder.png"
 			},
 			{
 				"type": "png",
 				"name": "ICON_NOT_AVAILABLE",
-				"file": "images/icons/not-available.png"
+				"file": "img/not-available.png"
 			}
 	]
   }
